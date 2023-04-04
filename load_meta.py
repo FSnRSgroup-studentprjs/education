@@ -1,3 +1,26 @@
+### import modules ###
+import pandas as pd
+import os
+import dhs_f_education
+import fnmatch
+import pyreadstat
+
+### options ###
+min_dhs_version = 6
+
+###Paths
+dhs_path = r"/mnt/datadisk/data/surveys/DHS_raw_data/"
+projects_p = r"/mnt/datadisk/data/Projects/education/"
+locations_f = projects_p + '/' + 'locations.csv'
+
+#walk folder for finding .tifs
+walk_f = r"/mnt/datadisk/"
+
+#might be split into urban/rural as well cf. below
+out_f = projects_p + '/labels_new.csv'
+#export on HH level for further analysis (Imputation project Mrs. Pranti)
+out_f_hh = projects_p + '/hh_all.csv'
+
 def load_questionaires_meta(questionaire):
 ###load data, preselect water columns and save into pickle for faster reloading
 # Note: Important to use meta files since column names and especially value labels are unambiguous
@@ -55,7 +78,6 @@ def load_questionaires_meta(questionaire):
             # to show and find all relevant columns to do: export to csv?
             # Note not all column codes and column names are uniquee and written consistently
             if column_name[:2].lower() != 'na' :
-                print(column_code, column_name)
                 column_codes.append(column_code)
                 column_names.append(column_name)
                 questionaire_type.append(path.split("/")[-1][2:4])
@@ -84,7 +106,17 @@ def load_questionaires_meta(questionaire):
         # copy=True,
     )
 
-    print(df)
-    df.to_csv(projects_p + '/' + f"{questionaire}_vars.csv")
+    print("""
+    ####################################
+    ##### LOAD METADATA: COMPLETED #####
+    ####################################
+    """)
+
+    df.to_csv(projects_p + '/meta/meta_data_files/' + f"{questionaire}_vars.csv")
 
     return
+
+load_questionaires_meta('IR')
+load_questionaires_meta('MR')
+load_questionaires_meta('PR')
+load_questionaires_meta('HR')
